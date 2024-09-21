@@ -1,6 +1,6 @@
 Metadata-Version: 2.1
 Name: metrics-extras
-Version: 0.0.15
+Version: 0.1.0
 Summary: Falcon Contribution project
 Author-email: Nirbhay Gupta <nirbhay.gupta@junio.in>
 Classifier: Programming Language :: Python :: 3

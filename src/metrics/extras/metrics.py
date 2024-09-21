@@ -75,37 +75,42 @@ class Metrics:
 
     def inc(self, name: str, value: Union[int, float] = 1, labels: Dict[str, any] = {}):
         metric = self._get_metric(name)
-        if labels is None:
-            labels = {}
         if not isinstance(metric, (Counter, Gauge)):
             raise TypeError("invalid metric asked for increment")
-
+        if labels is None:
+            metric.inc(value)
+            return
         metric.labels(**labels).inc(value)
 
     def dec(
         self, name: str, value: Union[int, float] = 1, labels: Dict[str, any] = None
     ):
         metric = self._get_metric(name)
-        if labels is None:
-            labels = {}
         if not isinstance(metric, (Counter, Gauge)):
             raise TypeError("invalid metric asked for decrement")
 
+        if labels is None:
+            metric.dec(value)
+            return
         metric.labels(**labels).dec(value)
 
     def set(
         self, name: str, value: Union[int, float] = 1, labels: Dict[str, any] = None
     ):
         metric = self._get_metric(name)
-        if labels is None:
-            labels = {}
-
+        
         if not isinstance(metric, (Counter, Gauge, Summary, Histogram)):
             raise TypeError("invalid metric asked for decrement")
 
         if isinstance(metric, (Counter, Gauge)):
+            if labels is None:
+                metric.set(value)
+                return
             metric.labels(**labels).set(value)
         elif isinstance(metric, (Summary, Histogram)):
+            if labels is None:
+                metric.observe(value)
+                return
             metric.labels(**labels).observe(value)
 
     def expose(self) -> bytes:
