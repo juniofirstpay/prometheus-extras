@@ -25,7 +25,10 @@ class Metrics:
         if config.multiproc_dir:
             MultiProcessCollector(registry=self._registry)
 
-        self._metrics = dict(self._parse(config.metrics))
+        self._metrics = dict()
+        for metric_name, metric in self._parse(config.metrics):
+            self._registry.register(metric)
+            self._metrics[metric_name] = metric
 
     async def expose_async(self, scope, receive, send):
         data = generate_latest(self._registry)
