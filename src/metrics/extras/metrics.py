@@ -44,14 +44,14 @@ class Metrics:
 
 
     def _parse(self, metrics: List[MetricConfig]):
-        metrics = []
+        _metrics = []
         for metric in metrics:
             metric_cls = self._get_metric_cls(metric.type)
-            metrics.append(
-                metric.name,
-                metric_cls(metric.name, metric.description, labelnames=metric.labels),
+            _metrics.append(
+                (metric.name,
+                metric_cls(metric.name, metric.description, labelnames=metric.labels)),
             )
-        return metrics
+        return _metrics
 
     def _get_metric_cls(self, metric_type: str) -> Type[MetricType]:
         if metric_type == "counter":
