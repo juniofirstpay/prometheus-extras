@@ -1,4 +1,4 @@
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 from typing import List, TypeVar
 from prometheus_client import Counter, Gauge, Summary, Histogram, Info, Enum
 
@@ -10,8 +10,8 @@ class Metric:
     type: str
     name: str
     description: str
-    labels: List[str] = []
-    states: List[str] = []
+    labels: List[str] = field(default_factory=list)
+    states: List[str] = field(default_factory=list)
 
 
 @dataclass(init=True)
