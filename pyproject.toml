@@ -8,7 +8,7 @@ include = ["metrics.extras"]
 
 [project]
 name = "metrics-extras"
-version = "0.0.11"
+version = "0.0.12"
 authors = [
   { name="Nirbhay Gupta", email="nirbhay.gupta@junio.in" },
 ]

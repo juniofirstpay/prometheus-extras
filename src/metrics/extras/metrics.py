@@ -11,7 +11,7 @@ from prometheus_client import (
     CONTENT_TYPE_LATEST
 )
 from typing import Dict, List, Union, Type
-from .shared import MetricConfig, MetricType, Config
+from .shared import Metric as MetricConfig, MetricType, MetricConfig as Config
 
 
 class Metrics:
