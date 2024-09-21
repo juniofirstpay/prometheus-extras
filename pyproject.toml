@@ -8,7 +8,7 @@ include = ["metrics.extras"]
 
 [project]
 name = "metrics-extras"
-version = "0.1.1"
+version = "0.1.2"
 authors = [
   { name="Nirbhay Gupta", email="nirbhay.gupta@junio.in" },
 ]
@@ -21,7 +21,7 @@ classifiers = [
     "Operating System :: OS Independent",
 ]
 dependencies=[
-    "prometheus_client"
+    "prometheus-client"
 ]
 
 [tool.pytest.ini_options]
