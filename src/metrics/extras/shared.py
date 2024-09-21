@@ -17,4 +17,4 @@ class Metric:
 @dataclass(init=True)
 class MetricConfig:
     metrics: List[Metric]
-    multiproc_dir: str
+    multiproc_dir: str = None
