@@ -27,15 +27,20 @@ class Metrics:
 
         self._metrics = dict(self._parse(config.metrics))
 
-    def __call__(self, environ, start_response):
+    async def expose_async(self, scope, receive, send):
         data = generate_latest(self._registry)
-        status = '200 OK'
-        response_headers = [
-            ('Content-type', CONTENT_TYPE_LATEST),
-            ('Content-Length', str(len(data)))
-        ]
-        start_response(status, response_headers)
-        return iter([data])
+        await send({
+            'type': 'http.response.start',
+            'status': 200,
+            'headers': [
+                ('content-type', CONTENT_TYPE_LATEST),
+                ('content-length', str(len(data)))
+            ],
+        })
+        await send({
+            'type': 'http.response.body',
+            'body': data,
+        })
 
 
     def _parse(self, metrics: List[MetricConfig]):
