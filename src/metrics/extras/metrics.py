@@ -73,7 +73,7 @@ class Metrics:
             raise NotImplementedError()
         return metric
 
-    def inc(self, name: str, value: Union[int, float] = 1, labels: Dict[str, any] = {}):
+    def inc(self, name: str, value: Union[int, float] = 1, labels: Dict[str, any] = None):
         metric = self._get_metric(name)
         if not isinstance(metric, (Counter, Gauge)):
             raise TypeError("invalid metric asked for increment")
