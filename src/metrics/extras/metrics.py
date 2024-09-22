@@ -58,6 +58,7 @@ class Metrics:
                         "worker": str(os.getpid()),
                         "thread": str(threading.get_ident()), 
                     })
+                    MultiProcessCollector(self._registry)
                     data = generate_latest(self._registry)
                     await send(
                         {
