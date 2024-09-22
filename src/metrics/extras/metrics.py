@@ -16,6 +16,7 @@ from typing import Dict, List, Union, Type, Callable
 from .shared import Metric as MetricConfig, MetricType, MetricConfig as Config
 from .defaults import defaults
 
+
 class Metrics:
 
     _metrics: Dict[str, MetricType]
@@ -66,15 +67,47 @@ class Metrics:
                         }
                     )
                 else:
-                    default_labels = {"method": scope["method"], "path": scope["path"]}
-                    
-                    self.inc("http_requests_active", 1, labels=default_labels)
+                    self.inc(
+                        "http_requests_active",
+                        1,
+                        labels={
+                            "method": scope["method"],
+                            "path": scope["path"],
+                            "version": 0,
+                        },
+                    )
 
                     await callable(scope, receive, send)
-                    
-                    self.dec("http_requests_total", 1, labels=default_labels)
-                    self.inc("http_requests_total", 1, labels=default_labels)
-                    self.set("http_requests_latency", 1, labels=default_labels)
+
+                    self.dec(
+                        "http_requests_active",
+                        1,
+                        labels={
+                            "method": scope["method"],
+                            "path": scope["path"],
+                            "version": 0,
+                        },
+                    )
+                    self.inc(
+                        "http_requests_total",
+                        1,
+                        labels={
+                            "method": scope["method"],
+                            "path": scope["path"],
+                            "version": 0,
+                            "status": 200,
+                        },
+                    )
+                    self.set(
+                        "http_requests_latency",
+                        1,
+                        labels={
+                            "method": scope["method"],
+                            "path": scope["path"],
+                            "version": 0,
+                            "status": 200,
+                        },
+                    )
 
             return metrics_asgi_app
         else:
