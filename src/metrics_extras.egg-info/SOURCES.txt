@@ -1,5 +1,6 @@
 pyproject.toml
 src/metrics/extras/__init__.py
+src/metrics/extras/defaults.py
 src/metrics/extras/metrics.py
 src/metrics/extras/shared.py
 src/metrics_extras.egg-info/PKG-INFO

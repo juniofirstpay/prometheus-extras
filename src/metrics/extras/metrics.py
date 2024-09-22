@@ -14,7 +14,7 @@ from prometheus_client import (
 )
 from typing import Dict, List, Union, Type, Callable
 from .shared import Metric as MetricConfig, MetricType, MetricConfig as Config
-
+from .defaults import defaults
 
 class Metrics:
 
@@ -29,6 +29,11 @@ class Metrics:
             MultiProcessCollector(registry=self._registry)
 
         self._metrics = dict()
+        
+        for metric_name, metric in self._parse(defaults):
+            self._registry.register(metric)
+            self._metrics[metric_name] = metric
+
         for metric_name, metric in self._parse(config.metrics):
             self._registry.register(metric)
             self._metrics[metric_name] = metric
