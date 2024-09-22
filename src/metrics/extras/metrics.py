@@ -55,8 +55,8 @@ class Metrics:
                     info = self._get_metric("http_worker_info")
                     info.info({
                         "python_version": sys.version,
-                        "worker": os.getpid(),
-                        "thread": threading.get_native_id(), 
+                        "worker": str(os.getpid()),
+                        "thread": str(threading.get_ident()), 
                     })
                     data = generate_latest(self._registry)
                     await send(
