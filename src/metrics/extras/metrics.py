@@ -66,13 +66,15 @@ class Metrics:
                         }
                     )
                 else:
-                    self.inc("http_requests_active", 1, labels=[scope["method"], scope["path"]])
+                    default_labels = {"method": scope["method"], "path": scope["path"]}
+                    
+                    self.inc("http_requests_active", 1, labels=default_labels)
 
                     await callable(scope, receive, send)
                     
-                    self.dec("http_requests_total", 1, labels=[scope["method"], scope["path"]])
-                    self.inc("http_requests_total", 1, labels=[scope["method"], scope["path"]])
-                    self.set("http_requests_latency", 1, labels=[scope["method"], scope["path"]])
+                    self.dec("http_requests_total", 1, labels=default_labels)
+                    self.inc("http_requests_total", 1, labels=default_labels)
+                    self.set("http_requests_latency", 1, labels=default_labels)
 
             return metrics_asgi_app
         else:
