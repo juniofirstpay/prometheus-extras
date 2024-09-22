@@ -52,7 +52,7 @@ class Metrics:
                     scope["path"] == self._config.read_path
                     and self._config.read_port == scope["server"][1]
                 ):
-                    info = self._get_metric("info")
+                    info = self._get_metric("http_worker_info")
                     info.info({
                         "python_version": sys.version,
                         "worker": os.getpid(),
