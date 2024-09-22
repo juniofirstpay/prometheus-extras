@@ -1,5 +1,8 @@
+import os
+import sys
 import inspect
 import time
+import threading
 from prometheus_client.multiprocess import MultiProcessCollector
 from prometheus_client import (
     CollectorRegistry,
@@ -39,11 +42,22 @@ class Metrics:
             self._registry.register(metric)
             self._metrics[metric_name] = metric
 
+
     def __call__(self, callable: Callable):
 
         if inspect.iscoroutinefunction(callable):
 
             async def metrics_asgi_app(scope, receive, send):
+
+                if scope["type"] == "lifespan":
+                    info = self._get_metric("info")
+                    info.info({
+                        "python_version": sys.version,
+                        "worker": os.getpid(),
+                        "thread": threading.get_native_id(), 
+                    })
+
+                assert scope["type"] in ("http", "https")
 
                 if (
                     scope["path"] == self._config.read_path

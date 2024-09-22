@@ -20,4 +20,9 @@ defaults = [
         "Counts all http requests latency",
         labels=["method", "path", "status", "version"],
     ),
+    Metric(
+        "info",
+        "http_worker_info",
+        "describes the http worker"
+    )
 ]
