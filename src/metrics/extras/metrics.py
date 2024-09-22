@@ -30,7 +30,7 @@ class Metrics:
         self._registry = CollectorRegistry()
 
         if config.multiproc_dir:
-            MultiProcessCollector(registry=self._registry)
+            MultiProcessCollector(registry=self._registry, path=self._config.multiproc_dir)
 
         self._metrics = dict()
 
@@ -58,7 +58,6 @@ class Metrics:
                         "worker": str(os.getpid()),
                         "thread": str(threading.get_ident()), 
                     })
-                    MultiProcessCollector(self._registry)
                     data = generate_latest(self._registry)
                     await send(
                         {
