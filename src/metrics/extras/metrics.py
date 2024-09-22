@@ -29,7 +29,7 @@ class Metrics:
             MultiProcessCollector(registry=self._registry)
 
         self._metrics = dict()
-        
+
         for metric_name, metric in self._parse(defaults):
             self._registry.register(metric)
             self._metrics[metric_name] = metric
@@ -66,7 +66,13 @@ class Metrics:
                         }
                     )
                 else:
+                    self.inc("http_requests_active", 1, labels=[scope["method"], scope["path"]])
+
                     await callable(scope, receive, send)
+                    
+                    self.dec("http_requests_total", 1, labels=[scope["method"], scope["path"]])
+                    self.inc("http_requests_total", 1, labels=[scope["method"], scope["path"]])
+                    self.set("http_requests_latency", 1, labels=[scope["method"], scope["path"]])
 
             return metrics_asgi_app
         else:
