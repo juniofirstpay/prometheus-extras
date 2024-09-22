@@ -48,21 +48,16 @@ class Metrics:
         if inspect.iscoroutinefunction(callable):
 
             async def metrics_asgi_app(scope, receive, send):
-
-                if scope["type"] == "lifespan":
+                if (
+                    scope["path"] == self._config.read_path
+                    and self._config.read_port == scope["server"][1]
+                ):
                     info = self._get_metric("info")
                     info.info({
                         "python_version": sys.version,
                         "worker": os.getpid(),
                         "thread": threading.get_native_id(), 
                     })
-
-                assert scope["type"] in ("http", "https")
-
-                if (
-                    scope["path"] == self._config.read_path
-                    and self._config.read_port == scope["server"][1]
-                ):
                     data = generate_latest(self._registry)
                     await send(
                         {
