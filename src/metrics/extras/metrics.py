@@ -1,5 +1,5 @@
 import inspect
-
+import time
 from prometheus_client.multiprocess import MultiProcessCollector
 from prometheus_client import (
     CollectorRegistry,
@@ -77,7 +77,11 @@ class Metrics:
                         },
                     )
 
+                    start_time = time.perf_counter()
+
                     await callable(scope, receive, send)
+
+                    end_time = time.perf_counter()
 
                     self.dec(
                         "http_requests_active",
@@ -100,7 +104,7 @@ class Metrics:
                     )
                     self.set(
                         "http_requests_latency",
-                        1,
+                        end_time - start_time,
                         labels={
                             "method": scope["method"],
                             "path": scope["path"],
