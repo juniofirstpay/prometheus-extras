@@ -10,7 +10,7 @@ from prometheus_client import (
     Info,
     Enum,
     generate_latest,
-    CONTENT_TYPE_LATEST
+    CONTENT_TYPE_LATEST,
 )
 from typing import Dict, List, Union, Type, Callable
 from .shared import Metric as MetricConfig, MetricType, MetricConfig as Config
@@ -22,6 +22,7 @@ class Metrics:
     _registry: CollectorRegistry
 
     def __init__(self, config: Config):
+        self._config = config
         self._registry = CollectorRegistry()
 
         if config.multiproc_dir:
@@ -32,44 +33,55 @@ class Metrics:
             self._registry.register(metric)
             self._metrics[metric_name] = metric
 
-    
     def __call__(self, callable: Callable):
+
         if inspect.iscoroutinefunction(callable):
+
             async def metrics_asgi_app(scope, receive, send):
 
-                if scope["path"] == "/_metrics":
-
+                if (
+                    scope["path"] == self._config.read_path
+                    and self._config.read_port == scope["server"][1]
+                ):
                     data = generate_latest(self._registry)
-                    await send({
-                        'type': 'http.response.start',
-                        'status': 200,
-                        'headers': [
-                            ('content-type', CONTENT_TYPE_LATEST),
-                            ('content-length', str(len(data)))
-                        ],
-                    })
-                    await send({
-                        'type': 'http.response.body',
-                        'body': data,
-                    })
+                    await send(
+                        {
+                            "type": "http.response.start",
+                            "status": 200,
+                            "headers": [
+                                ("content-type", CONTENT_TYPE_LATEST),
+                                ("content-length", str(len(data))),
+                            ],
+                        }
+                    )
+                    await send(
+                        {
+                            "type": "http.response.body",
+                            "body": data,
+                        }
+                    )
                 else:
                     await callable(scope, receive, send)
 
-
             return metrics_asgi_app
         else:
+
             def metrics_wsgi_app(environ, start_response):
-                if environ["path"] == "/_metrics":
+                if (
+                    environ["path"] == self._config.read_path
+                    and self._config.read_port == environ["server"][1]
+                ):
                     data = generate_latest(self._registry)
-                    status = '200 OK'
+                    status = "200 OK"
                     response_headers = [
-                        ('Content-type', CONTENT_TYPE_LATEST),
-                        ('Content-Length', str(len(data)))
+                        ("Content-type", CONTENT_TYPE_LATEST),
+                        ("Content-Length", str(len(data))),
                     ]
                     start_response(status, response_headers)
                     return iter([data])
-                
+
                 return callable(environ, start_response)
+
             return metrics_wsgi_app
 
     def _parse(self, metrics: List[MetricConfig]):
@@ -77,8 +89,12 @@ class Metrics:
         for metric in metrics:
             metric_cls = self._get_metric_cls(metric.type)
             _metrics.append(
-                (metric.name,
-                metric_cls(metric.name, metric.description, labelnames=metric.labels)),
+                (
+                    metric.name,
+                    metric_cls(
+                        metric.name, metric.description, labelnames=metric.labels
+                    ),
+                ),
             )
         return _metrics
 
@@ -102,7 +118,9 @@ class Metrics:
             raise NotImplementedError()
         return metric
 
-    def inc(self, name: str, value: Union[int, float] = 1, labels: Dict[str, any] = None):
+    def inc(
+        self, name: str, value: Union[int, float] = 1, labels: Dict[str, any] = None
+    ):
         metric = self._get_metric(name)
         if not isinstance(metric, (Counter, Gauge)):
             raise TypeError("invalid metric asked for increment")
@@ -127,7 +145,7 @@ class Metrics:
         self, name: str, value: Union[int, float] = 1, labels: Dict[str, any] = None
     ):
         metric = self._get_metric(name)
-        
+
         if not isinstance(metric, (Counter, Gauge, Summary, Histogram)):
             raise TypeError("invalid metric asked for decrement")
 

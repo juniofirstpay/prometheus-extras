@@ -18,3 +18,5 @@ class Metric:
 class MetricConfig:
     metrics: List[Metric]
     multiproc_dir: str = None
+    read_path: str = "/_metrics"
+    read_port: int = 8771
